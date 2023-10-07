@@ -49,13 +49,11 @@ const calculate = async () => {
   const result = await v$.value.$validate()
   if (!result) {
     // notify user form is invalid
-    console.log(result, v$.value)
     return
   }
-  console.log('all ok')
 
   const now = new Date();
-  const birthDate = new Date('1984-09-24');
+  const birthDate = new Date(`${formData.year}-${formData.month}-${formData.day}`);
 
   //Get the Timestamp
   const now_time_stamp = now.getTime();

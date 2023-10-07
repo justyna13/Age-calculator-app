@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import btnIcon from "../assets/icon-arrow.svg";
-import { computed, reactive } from "vue";
+import { computed, reactive, watch } from "vue";
 import { useVuelidate } from '@vuelidate/core'
 import { required, integer, helpers, between } from '@vuelidate/validators'
 
@@ -15,20 +15,28 @@ const formData = reactive({
   year: null
 });
 
+const getNumberOfDaysInMonth = (month: number, year: number) => {
+  return new Date(year, month, 0).getDate()
+}
 // Validation
+const maxDaysPerMoth = {
+  '1': 31,
+  '2': 30,
+  '3': 31
+}
 const rules = computed(() => ({
   day: {
     required: helpers.withMessage('Day is required', required),
     integer: helpers.withMessage('Entered value is invalid', integer),
-    between: helpers.withMessage('Entered value is invalid', between(1, 31)),
+    between: helpers.withMessage( 'Entered value is invalid', (formData.year && formData.month) ? between(1, getNumberOfDaysInMonth(formData.month, formData.year)) : between(1, 31)),
   },
   month: {
-    required,
+    required: helpers.withMessage('Month is required', required),
     integer: helpers.withMessage('Entered value is invalid', integer),
     between: helpers.withMessage('Entered value is invalid', between(1, 12)),
   },
   year: {
-    required,
+    required: helpers.withMessage('Year is required', required),
     integer: helpers.withMessage('Entered value is invalid', integer),
     between: helpers.withMessage('Entered value is invalid', between(1, 2023)),
   }
@@ -79,6 +87,10 @@ const calculate = async () => {
 const resetForm = () => {
   emits('calculated', {days: null, months: null, years: null});
 }
+
+watch(formData, () => {
+  resetForm()
+})
 </script>
 
 <template>

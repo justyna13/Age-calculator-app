@@ -1,13 +1,30 @@
-<script setup>
+<script setup lang="ts">
 import CalculatorResults from "./components/CalculatorResults.vue";
 import CalculatorForm from "./components/CalculatorForm.vue";
+import { Ref, ref } from "vue";
+
+interface CalculatedResultsType {
+  years: number | null,
+  months: number | null,
+  days: number | null,
+}
+
+// Data
+const calculatedResults: Ref<CalculatedResultsType> = ref({
+  years: null,
+  months: null,
+  days: null,
+});
 
 </script>
 
 <template>
   <div class="card">
     <CalculatorForm />
-    <CalculatorResults />
+    <CalculatorResults
+      :days="calculatedResults.days"
+      :months="calculatedResults.months"
+      :years="calculatedResults.years"/>
   </div>
 </template>
 

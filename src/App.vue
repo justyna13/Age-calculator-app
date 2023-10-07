@@ -5,14 +5,14 @@ import CalculatorForm from "./components/CalculatorForm.vue";
 </script>
 
 <template>
-  <div>
+  <div class="card">
     <CalculatorForm />
     <CalculatorResults />
   </div>
 </template>
 
-<style lang="scss">
-body {
-  background-color: $clr-purple;
+<style lang="scss" scoped>
+.card {
+  background-color: $clr-white;
 }
 </style>

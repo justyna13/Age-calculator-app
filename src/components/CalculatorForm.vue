@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import btnIcon from "../assets/icon-arrow.svg";
-import { reactive } from "vue";
+import { computed, reactive } from "vue";
+import { useVuelidate } from '@vuelidate/core'
+import { required, integer, helpers, between } from '@vuelidate/validators'
 
 const emits = defineEmits<{
   calculated: [Function],
@@ -13,8 +15,37 @@ const formData = reactive({
   year: null
 });
 
+// Validation
+const rules = computed(() => ({
+  day: {
+    required: helpers.withMessage('Day is required', required),
+    integer: helpers.withMessage('Entered value is invalid', integer),
+    between: helpers.withMessage('Entered value is invalid', between(1, 31)),
+  },
+  month: {
+    required,
+    integer: helpers.withMessage('Entered value is invalid', integer),
+    between: helpers.withMessage('Entered value is invalid', between(1, 12)),
+  },
+  year: {
+    required,
+    integer: helpers.withMessage('Entered value is invalid', integer),
+    between: helpers.withMessage('Entered value is invalid', between(1, 2023)),
+  }
+}))
 
-const calculate = () => {
+const v$ = useVuelidate(rules, formData)
+
+
+const calculate = async () => {
+  const result = await v$.value.$validate()
+  if (!result) {
+    // notify user form is invalid
+    console.log(result, v$.value)
+    return
+  }
+  console.log('all ok')
+
   const now = new Date();
   const birthDate = new Date('1984-09-24');
 
@@ -42,28 +73,52 @@ const calculate = () => {
 
   console.log(years_passed, months_passed, days_passed)
 
-  emits('calculated', { days: days_passed, months: months_passed, years: years_passed});
+  emits('calculated', {days: days_passed, months: months_passed, years: years_passed});
 }
 
 const resetForm = () => {
-  emits('calculated', { days: null, months: null, years: null});
+  emits('calculated', {days: null, months: null, years: null});
 }
 </script>
 
 <template>
-  <form @submit.prevent="calculate" class="calculator-form">
+  <form @submit.prevent="calculate" class="calculator-form" novalidate>
     <div class="calculator-form__inputs">
       <div class="calculator-form__inputs__col">
         <label for="age-day">Day</label>
-        <input v-model="formData.day" id="age-day" type="number" class="calculator-form__input" placeholder="DD">
+        <input
+          v-model="formData.day"
+          id="age-day"
+          type="text"
+          class="calculator-form__input"
+          :class="{'invalid': v$.day.$error}"
+          placeholder="DD"
+          @blur="v$.day.$touch">
+        <p v-if="v$.day.$errors.length" class="input-error">{{ v$.day.$errors[0].$message}}</p>
       </div>
       <div class="calculator-form__inputs__col">
         <label for="age-month">Month</label>
-        <input id="age-month" type="number" class="calculator-form__input" placeholder="MM">
+        <input
+          v-model="formData.month"
+          id="age-month"
+          type="text"
+          class="calculator-form__input"
+          :class="{'invalid': v$.month.$error}"
+          placeholder="MM"
+          @blur="v$.month.$touch()">
+        <p v-if="v$.month.$errors.length" class="input-error">{{ v$.month.$errors[0].$message}}</p>
       </div>
       <div class="calculator-form__inputs__col">
         <label for="age-year">Year</label>
-        <input id="age-year" type="number" class="calculator-form__input" placeholder="YY">
+        <input
+          v-model="formData.year"
+          id="age-year"
+          type="text"
+          class="calculator-form__input"
+          :class="{'invalid': v$.year.$error}"
+          placeholder="YY"
+          @blur="v$.year.$touch()">
+        <p v-if="v$.year.$errors.length" class="input-error">{{ v$.year.$errors[0].$message}}</p>
       </div>
     </div>
 
@@ -101,7 +156,6 @@ const resetForm = () => {
   }
 
   &__input {
-    -moz-appearance: textfield;
     width: 100%;
     border-radius: 4px;
     box-shadow: none;
@@ -115,11 +169,18 @@ const resetForm = () => {
     &::placeholder {
       color: $clr-grey-smokey;
     }
+
     &:focus {
       outline: none !important;
       border-color: $clr-purple;
     }
+
+    &.invalid,
+    &.invalid:focus {
+      border-color: $clr-red-light;
+    }
   }
+
   &__btn {
     display: flex;
     justify-content: flex-end;
@@ -134,6 +195,7 @@ const resetForm = () => {
       content: "";
       z-index: 0;
     }
+
     button {
       background-color: $clr-purple;
       border-radius: 50%;
@@ -142,9 +204,14 @@ const resetForm = () => {
       z-index: 1;
       cursor: pointer;
     }
+
     img {
       height: 30px;
     }
+  }
+  .input-error {
+    color: $clr-red-light;
+    font-size: .7rem;
   }
 }
 </style>

@@ -1,8 +1,52 @@
 <script setup lang="ts">
 import btnIcon from "../assets/icon-arrow.svg";
+import { reactive } from "vue";
+
+const emits = defineEmits<{
+  calculated: [Function],
+  reset: [Function]
+}>();
+
+const formData = reactive({
+  day: null,
+  month: null,
+  year: null
+});
+
 
 const calculate = () => {
-  console.log('click')
+  const now = new Date();
+  const birthDate = new Date('1984-09-24');
+
+  //Get the Timestamp
+  const now_time_stamp = now.getTime();
+  const birthDate_time_stamp = birthDate.getTime();
+
+  let calc;
+
+  //Check which timestamp is greater
+  if (now_time_stamp > birthDate_time_stamp) {
+    calc = new Date(now_time_stamp - birthDate_time_stamp);
+  } else {
+    calc = new Date(birthDate_time_stamp - now_time_stamp);
+  }
+  //Retrieve the date, month and year
+  const calcFormatTmp = calc.getDate() + '-' + (calc.getMonth() + 1) + '-' + calc.getFullYear();
+  //Convert to an array and store
+  const calcFormat = calcFormatTmp.split("-");
+  //Subtract each member of our array from the default date
+  const days_passed = Number(Math.abs(calcFormat[0]) - 1);
+  const months_passed = Number(Math.abs(calcFormat[1]) - 1);
+  const years_passed = Number(Math.abs(calcFormat[2]) - 1970);
+
+
+  console.log(years_passed, months_passed, days_passed)
+
+  emits('calculated', { days: days_passed, months: months_passed, years: years_passed});
+}
+
+const resetForm = () => {
+  emits('calculated', { days: null, months: null, years: null});
 }
 </script>
 
@@ -11,7 +55,7 @@ const calculate = () => {
     <div class="calculator-form__inputs">
       <div class="calculator-form__inputs__col">
         <label for="age-day">Day</label>
-        <input id="age-day" type="number" class="calculator-form__input" placeholder="DD">
+        <input v-model="formData.day" id="age-day" type="number" class="calculator-form__input" placeholder="DD">
       </div>
       <div class="calculator-form__inputs__col">
         <label for="age-month">Month</label>

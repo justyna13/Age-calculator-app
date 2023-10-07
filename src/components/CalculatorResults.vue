@@ -1,11 +1,11 @@
 <script setup lang="ts">
+
 const props = defineProps<{
   days: number | null
   months: number | null
   years: number | null
 }>();
 
-const a: boolean = 3;
 </script>
 
 <template>

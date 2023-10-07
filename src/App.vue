@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import CalculatorResults from "./components/CalculatorResults.vue";
 import CalculatorForm from "./components/CalculatorForm.vue";
-import { Ref, ref } from "vue";
+import { reactive } from "vue";
 
 interface CalculatedResultsType {
   years: number | null,
@@ -10,17 +10,24 @@ interface CalculatedResultsType {
 }
 
 // Data
-const calculatedResults: Ref<CalculatedResultsType> = ref({
+const calculatedResults: CalculatedResultsType = reactive({
   years: null,
   months: null,
   days: null,
 });
 
+
+const updateCalculatedResults = (results: CalculatorResults) => {
+  calculatedResults.years = results.years ;
+  calculatedResults.months = results.months;
+  calculatedResults.days = results.days;
+}
+
 </script>
 
 <template>
   <div class="card">
-    <CalculatorForm />
+    <CalculatorForm @calculated="updateCalculatedResults" />
     <CalculatorResults
       :days="calculatedResults.days"
       :months="calculatedResults.months"

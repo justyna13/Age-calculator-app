@@ -4,36 +4,60 @@ import { computed, reactive, watch } from "vue";
 import { useVuelidate } from '@vuelidate/core'
 import { required, integer, helpers, between } from '@vuelidate/validators'
 
-const emits = defineEmits<{
-  calculated: [Function],
-  reset: [Function]
-}>();
-
+// Data
 const formData = reactive({
   day: null,
   month: null,
   year: null
 });
 
-const getNumberOfDaysInMonth = (month: number, year: number) => {
-  return new Date(year, month, 0).getDate()
-}
+// Emits
+const emits = defineEmits<{
+  calculated: [Function],
+  reset: [Function]
+}>();
+
 // Validation
-const maxDaysPerMoth = {
-  '1': 31,
-  '2': 30,
-  '3': 31
+const getMinMaxDayRange = () => {
+  const minDay = 1;
+
+  if (!formData.month || !formData.year) {
+    return between(minDay, 31)
+  }
+
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  const currentDay = now.getDate();
+
+  if (Number(formData.year) === currentYear && Number(formData.month) === currentMonth) {
+    return between(minDay, currentDay)
+  }
+
+  const maxDay = new Date(formData.year, formData.month, 0).getDate()
+  return between(minDay, maxDay)
 }
+
+const getMinMaxMonthRange = () => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  if (Number(formData.year) === currentYear) {
+    const currentMonth = now.getMonth() + 1;
+    return between(1, currentMonth)
+  }
+  return between(1, 12)
+}
+
 const rules = computed(() => ({
   day: {
     required: helpers.withMessage('Day is required', required),
     integer: helpers.withMessage('Entered value is invalid', integer),
-    between: helpers.withMessage( 'Entered value is invalid', (formData.year && formData.month) ? between(1, getNumberOfDaysInMonth(formData.month, formData.year)) : between(1, 31)),
+    between: helpers.withMessage( 'Entered value is invalid', getMinMaxDayRange()),
   },
   month: {
     required: helpers.withMessage('Month is required', required),
     integer: helpers.withMessage('Entered value is invalid', integer),
-    between: helpers.withMessage('Entered value is invalid', between(1, 12)),
+    between: helpers.withMessage('Entered value is invalid', getMinMaxMonthRange()),
   },
   year: {
     required: helpers.withMessage('Year is required', required),
@@ -44,7 +68,7 @@ const rules = computed(() => ({
 
 const v$ = useVuelidate(rules, formData)
 
-
+// Methods
 const calculate = async () => {
   const result = await v$.value.$validate()
   if (!result) {
@@ -75,9 +99,6 @@ const calculate = async () => {
   const days_passed = Number(Math.abs(calcFormat[0]) - 1);
   const months_passed = Number(Math.abs(calcFormat[1]) - 1);
   const years_passed = Number(Math.abs(calcFormat[2]) - 1970);
-
-
-  console.log(years_passed, months_passed, days_passed)
 
   emits('calculated', {days: days_passed, months: months_passed, years: years_passed});
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import btnIcon from "../assets/icon-arrow.svg";
-import { computed, reactive, watch } from "vue";
+import { computed, reactive, ref, watch } from "vue";
 import { useVuelidate } from '@vuelidate/core'
 import { required, integer, helpers, between } from '@vuelidate/validators'
 
@@ -154,7 +154,7 @@ watch(formData, () => {
     </div>
 
     <div class="calculator-form__btn">
-      <button type="submit">
+      <button type="submit" @click="calculate">
         <img :src="btnIcon" alt="">
       </button>
     </div>

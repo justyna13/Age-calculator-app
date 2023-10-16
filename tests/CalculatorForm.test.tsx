@@ -1,8 +1,22 @@
 import { describe, expect } from "vitest";
+import { mount } from "@vue/test-utils";
+import CalculatorForm from "../src/components/CalculatorForm.vue";
 
 describe("CalculatorForm", () => {
-  it("Input border is red when class invalid", () => {
+  const wrapper = mount(CalculatorForm)
+  it("On button click, no values entered - inputs should  be invalid", async () => {
+    await wrapper.get("button").trigger("click");
 
+    // There should be 3 invalid inputs
+    const invalidInputs = wrapper.findAll("input.invalid")
+    expect(invalidInputs.length).toBe(3)
+
+    // There should not be any valid inputs
+    const validInputs = wrapper.findAll("input:not(.invalid)")
+    expect(validInputs.length).toBe(0)
+  })
+
+  it("Input border is red when class invalid", () => {
   })
 
   it("Input border is gray when no class invalid", () => {

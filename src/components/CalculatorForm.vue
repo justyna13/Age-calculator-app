@@ -125,7 +125,7 @@ watch(formData, () => {
           :class="{'invalid': v$.day.$error}"
           placeholder="DD"
           @blur="v$.day.$touch">
-        <p v-if="v$.day.$errors.length" class="input-error">{{ v$.day.$errors[0].$message}}</p>
+        <p v-if="v$.day.$errors.length" class="input-error input-error--day">{{ v$.day.$errors[0].$message}}</p>
       </div>
       <div class="calculator-form__inputs__col">
         <label for="age-month">Month</label>
@@ -137,7 +137,7 @@ watch(formData, () => {
           :class="{'invalid': v$.month.$error}"
           placeholder="MM"
           @blur="v$.month.$touch()">
-        <p v-if="v$.month.$errors.length" class="input-error">{{ v$.month.$errors[0].$message}}</p>
+        <p v-if="v$.month.$errors.length" class="input-error input-error--month">{{ v$.month.$errors[0].$message}}</p>
       </div>
       <div class="calculator-form__inputs__col">
         <label for="age-year">Year</label>
@@ -149,7 +149,7 @@ watch(formData, () => {
           :class="{'invalid': v$.year.$error}"
           placeholder="YY"
           @blur="v$.year.$touch()">
-        <p v-if="v$.year.$errors.length" class="input-error">{{ v$.year.$errors[0].$message}}</p>
+        <p v-if="v$.year.$errors.length" class="input-error input-error--year">{{ v$.year.$errors[0].$message}}</p>
       </div>
     </div>
 

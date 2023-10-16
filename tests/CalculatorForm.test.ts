@@ -8,35 +8,45 @@ describe("CalculatorForm", () => {
     await wrapper.get("button").trigger("click");
 
     // There should be 3 invalid inputs
-    const invalidInputs = wrapper.findAll("input.invalid")
-    expect(invalidInputs.length).toBe(3)
+    const invalidInputs = wrapper.findAll("input.invalid");
+    expect(invalidInputs.length).toBe(3);
 
-    // There should not be any valid inputs
-    const validInputs = wrapper.findAll("input:not(.invalid)")
-    expect(validInputs.length).toBe(0)
+    const validInputs = wrapper.findAll("input:not(.invalid)");
+    expect(validInputs.length).toBe(0);
   })
 
-  it("Input border is red when class invalid", () => {
+  it("Input day no error msg displayed when correct value entered", async () => {
+    const dayInput = wrapper.find("#age-day");
+    expect(dayInput.exists()).toBe(true);
+
+    await dayInput.setValue(2)
+    const dayInputErrorMsg = wrapper.find(".input-error--day");
+    expect(dayInputErrorMsg.exists()).toBe(false);
   })
 
-  it("Input border is gray when no class invalid", () => {
+  it("Input day show error msg when entered string", async () => {
+    const dayInput = wrapper.find("#age-day");
+    await dayInput.setValue("ads");
 
+    const dayInputErrorMsg = wrapper.find(".input-error--day");
+    expect(dayInputErrorMsg.text()).contain("Entered value is invalid");
   })
 
-  it("Input day show error msg when entered string", () => {
-
+  it("Input day show error msg when entered float", async () => {
+    const dayInput = wrapper.find("#age-day");
+    await dayInput.setValue(21.2)
+    const dayInputErrorMsg = wrapper.find(".input-error--day");
+    expect(dayInputErrorMsg.text()).contain("Entered value is invalid");
   })
 
-  it("Input day show error msg when entered float", () => {
-
-  })
-
-  it("Input day show error msg when entered number < 0", () => {
-
+  it("Input day show error msg when entered number < 0", async () => {
+    const dayInput = wrapper.find("#age-day");
+    await dayInput.setValue(-1);
+    const dayInputErrorMsg = wrapper.find(".input-error--day");
+    expect(dayInputErrorMsg.text()).contain("Entered value is invalid");
   })
 
   it("Future date entered, day only - input day shows error", () => {
-
   })
 
   it("Future date entered, month - input month shows error", () => {
